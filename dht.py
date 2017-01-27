@@ -150,7 +150,7 @@ class Spider(object):
             b'y': b'q',
             b'q': q,
             b'a': a,
-            b't': randomid(2)
+            b't': randomid(4)
         }
         self.sender.send(msg, addr)
 
