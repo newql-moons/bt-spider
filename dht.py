@@ -6,7 +6,7 @@ import logging
 from util import *
 from routetab import RouteTable
 from node import *
-from config import host, start_url
+from config import *
 
 
 class Spider(object):
@@ -94,12 +94,15 @@ class Spider(object):
         def get_peers():
             info_hash = a[b'info_hash']
             nodes = self.route_table.get_neighbor(info_hash)
+            b_str = pack_nodes(nodes)
+            if not NAT:
+                b_str += self.pack()
             r = {
                 b'id': self.node_id,
-                b'nodes': pack_nodes(nodes),
+                b'nodes': b_str,
                 b'token': randomid(8),
             }
-            logging.debug('Recv req(get_peers) from %s' % node)
+            logging.info('Recv req(get_peers)[%s] from %s' % (info_hash.hex(), node))
             self.resp(node, t, r)
             for nd in self.route_table.nodes():
                 self.get_peers(nd, info_hash)
@@ -180,6 +183,11 @@ class Spider(object):
             b'info_hash': info_hash
         }
         self.req(node, q, a)
+
+    def pack(self):
+        ip = socket.inet_aton(host[0])
+        port = struct.pack('!H', host[1])
+        return self.node_id + ip + port
 
 
 class MsgSender(threading.Thread):
