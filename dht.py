@@ -27,13 +27,16 @@ class Spider(object):
         clock = time.time()
         while True:
             try:
-                msg, addr = self.recver.recv()
-                self.msg_handler(msg, addr)
-            except queue.Empty:
+                try:
+                    msg, addr = self.recver.recv()
+                    self.msg_handler(msg, addr)
+                except queue.Empty:
+                    pass
+                if time.time() - clock > 5 * 60:
+                    self.fresh()
+                    clock = time.time()
+            except:
                 pass
-            if time.time() - clock > 5 * 60:
-                self.fresh()
-                clock = time.time()
 
     def join_dht(self):
         for addr in start_url:
