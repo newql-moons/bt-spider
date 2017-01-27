@@ -98,8 +98,6 @@ class Spider(object):
             info_hash = a[b'info_hash']
             nodes = self.route_table.get_neighbor(info_hash)
             b_str = pack_nodes(nodes)
-            if not NAT:
-                b_str += self.pack()
             r = {
                 b'id': self.node_id,
                 b'nodes': b_str,
