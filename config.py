@@ -3,3 +3,5 @@ start_url = [
     ('router.utorrent.com', 6881),
     ('dht.transmissionbt.com', 6881),
 ]
+
+spider_total = 5
