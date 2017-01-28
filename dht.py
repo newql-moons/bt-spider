@@ -3,6 +3,7 @@ import queue
 import socket
 import logging
 import multiprocessing
+import sys
 
 from util import *
 from routetab import RouteTable
@@ -78,6 +79,7 @@ class Spider(multiprocessing.Process):
                     self.route_table.insert(node)
         except KeyError:
             logging.error('Unknown msg: [%s] from [%s:%d]' % (dict(msg), addr[0], addr[1]))
+            logging.error(sys.exc_info()[:2])
 
     def req_handler(self, t, q, a, node):
         if node not in self.route_table:
@@ -195,17 +197,12 @@ class MsgSender(threading.Thread):
         super().__init__()
         self.sock = sock
         self.buf = queue.Queue()
-        # self.pool = threadpool.ThreadPool(5)
+        self.pool = threadpool.ThreadPool(5)
 
     def run(self):
         while True:
             data, addr = self.buf.get()
-            # self.pool.add_task(self.sock.sendto, data, addr)
-            try:
-                self.sock.sendto(data, addr)
-            except OSError:
-                logging.error('Msg: %s' % data)
-                logging.error('Addr: %s' % addr)
+            self.pool.add_task(self.sock.sendto, data, addr)
             self.buf.task_done()
 
     def send(self, msg, addr):
