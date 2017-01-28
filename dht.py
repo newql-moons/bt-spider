@@ -78,7 +78,7 @@ class Spider(multiprocessing.Process):
                 if node not in self.route_table:
                     self.route_table.insert(node)
         except KeyError:
-            logging.warning('Unknown msg: [%s] from [%s:%d]' % (dict(msg), addr[0], addr[1]))
+            logging.debug('Unknown msg: [%s] from [%s:%d]' % (dict(msg), addr[0], addr[1]))
             # logging.warning(sys.exc_info()[:2])
 
     def req_handler(self, t, q, a, node):
@@ -129,7 +129,7 @@ class Spider(multiprocessing.Process):
         try:
             handlers[q]()
         except KeyError:
-            logging.warning('Unknown request type: %s' % q)
+            logging.debug('Unknown request type: %s' % q)
 
     def resp_handler(self, r, node):
         # self.find_node(node, self.node_id)

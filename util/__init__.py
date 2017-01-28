@@ -2,7 +2,6 @@ import random
 import struct
 
 from . import bencode
-from . import threadpool
 
 
 def randomid(length=20):
