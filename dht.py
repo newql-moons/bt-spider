@@ -210,7 +210,7 @@ class MsgSender(threading.Thread):
             self.buf.task_done()
 
     def send(self, msg, addr):
-        # self.buf.join()
+        self.buf.join()
         data = bencode.dumps(msg)
         self.buf.put((data, addr))
 
@@ -223,7 +223,7 @@ class MsgReceiver(threading.Thread):
 
     def run(self):
         while True:
-            # self.buf.join()
+            self.buf.join()
             data, addr = self.sock.recvfrom(65535)
             self.buf.put((data, addr))
 
