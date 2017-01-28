@@ -1,4 +1,6 @@
 import logging
+import os
+import signal
 
 from dht import Spider
 from config import spider_total
@@ -13,5 +15,9 @@ if __name__ == '__main__':
         spider = Spider('0.0.0.0', 6886 + i)
         spider.start()
         spiders.append(spider)
-    for spider in spiders:
-        spider.join()
+    try:
+        for spider in spiders:
+            spider.join()
+    except KeyboardInterrupt:
+        for spider in spiders:
+            os.kill(spider.pid, signal.SIGKILL)
