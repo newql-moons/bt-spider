@@ -118,7 +118,7 @@ class Spider(multiprocessing.Process):
             r = {b'id': self.node_id}
             self.resp(node, t, r)
             info_hash = a[b'info_hash']
-            logging.info('Recv [magnet:?xt=urn:btih:%s] from %s' % (info_hash.hex(), node))
+            logging.info('Recv [magnet:?xt=urn:btih:%s]' % info_hash.hex())
 
         handlers = {
             b'ping': ping,
