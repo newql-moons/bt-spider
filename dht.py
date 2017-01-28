@@ -2,6 +2,7 @@ import threading
 import queue
 import socket
 import logging
+import multiprocessing
 
 from util import *
 from routetab import RouteTable
@@ -9,18 +10,21 @@ from node import *
 from config import *
 
 
-class Spider(object):
-    def __init__(self):
+class Spider(multiprocessing.Process):
+    def __init__(self, ip, port):
         super().__init__()
         self.node_id = randomid()
         self.route_table = RouteTable(self.node_id)
+        self.addr = (ip, port)
+        self.sender = None
+        self.recver = None
 
+    def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.bind(host)
+        sock.bind(self.addr)
         self.sender = MsgSender(sock)
         self.recver = MsgReceiver(sock)
 
-    def run(self):
         self.sender.start()
         self.recver.start()
         self.join_dht()
@@ -103,7 +107,7 @@ class Spider(object):
                 b'nodes': b_str,
                 b'token': randomid(8),
             }
-            logging.info('Recv req(get_peers)[%s] from %s' % (info_hash.hex(), node))
+            logging.debug('Recv req(get_peers)[%s] from %s' % (info_hash.hex(), node))
             self.resp(node, t, r)
             for nd in self.route_table.nodes():
                 self.get_peers(nd, info_hash)
@@ -112,7 +116,7 @@ class Spider(object):
             r = {b'id': self.node_id}
             self.resp(node, t, r)
             info_hash = a[b'info_hash']
-            logging.info('Recv a magnet link[%s] from %s' % (info_hash.hex(), node))
+            logging.info('Recv [magnet:?xt=urn:btih:%s] from %s' % (info_hash.hex(), node))
 
         handlers = {
             b'ping': ping,
@@ -184,11 +188,6 @@ class Spider(object):
             b'info_hash': info_hash
         }
         self.req(node, q, a)
-
-    def pack(self):
-        ip = socket.inet_aton(host[0])
-        port = struct.pack('!H', host[1])
-        return self.node_id + ip + port
 
 
 class MsgSender(threading.Thread):
