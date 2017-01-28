@@ -195,7 +195,7 @@ class MsgSender(threading.Thread):
         super().__init__()
         self.sock = sock
         self.buf = queue.Queue()
-        self.pool = threadpool.ThreadPool(10)
+        self.pool = threadpool.ThreadPool(5)
 
     def run(self):
         while True:
