@@ -201,7 +201,11 @@ class MsgSender(threading.Thread):
         while True:
             data, addr = self.buf.get()
             # self.pool.add_task(self.sock.sendto, data, addr)
-            self.sock.sendto(data, addr)
+            try:
+                self.sock.sendto(data, addr)
+            except OSError:
+                logging.error('Msg: %s' % data)
+                logging.error('Addr: %s' % addr)
             self.buf.task_done()
 
     def send(self, msg, addr):
