@@ -78,8 +78,8 @@ class Spider(multiprocessing.Process):
                 if node not in self.route_table:
                     self.route_table.insert(node)
         except KeyError:
-            logging.error('Unknown msg: [%s] from [%s:%d]' % (dict(msg), addr[0], addr[1]))
-            logging.error(sys.exc_info()[:2])
+            logging.warning('Unknown msg: [%s] from [%s:%d]' % (dict(msg), addr[0], addr[1]))
+            logging.warning(sys.exc_info()[:2])
 
     def req_handler(self, t, q, a, node):
         if node not in self.route_table:
@@ -129,7 +129,7 @@ class Spider(multiprocessing.Process):
         try:
             handlers[q]()
         except KeyError:
-            logging.error('Unknown request type: %s' % q)
+            logging.warning('Unknown request type: %s' % q)
 
     def resp_handler(self, r, node):
         # self.find_node(node, self.node_id)
@@ -210,7 +210,7 @@ class MsgSender(threading.Thread):
             self.buf.task_done()
 
     def send(self, msg, addr):
-        self.buf.join()
+        # self.buf.join()
         data = bencode.dumps(msg)
         self.buf.put((data, addr))
 
@@ -223,7 +223,7 @@ class MsgReceiver(threading.Thread):
 
     def run(self):
         while True:
-            self.buf.join()
+            # self.buf.join()
             data, addr = self.sock.recvfrom(65535)
             self.buf.put((data, addr))
 
